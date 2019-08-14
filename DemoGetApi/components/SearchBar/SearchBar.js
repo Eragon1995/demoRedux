@@ -6,8 +6,8 @@ const styles = require('./SearchBarStyles');
 export default class SearchBar extends Component {
   render() {
     return(
-
       <View style={styles.searchBarContainer}>
+        <Text style={styles.searchBarContainer}> Search Github Name</Text>
         <TextInput
           placeholder = 'Enter your search user'
           style = {styles.textInputSearch}

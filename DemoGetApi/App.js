@@ -8,7 +8,8 @@ import {
   TouchableOpacity,
   Alert,
   ScrollView,
-  SafeAreaView
+  SafeAreaView,
+  Image
 } from 'react-native';
 
 const screenWidth = Dimensions.get('window').width;
@@ -38,19 +39,41 @@ export default class App extends Component {
       });
   }
 
+  _showAlert = () => {
+    Alert.alert(
+       'Load More'
+    )
+ }
+
   _renderRepos = () => {
     return (
       <ScrollView>
         <SafeAreaView>
+        <Text style={styles.textName}>Số lượng repo: {JSON.stringify(this.state.repos.length)}</Text>
         {
           this.state.repos.map((repo, i) => {
             return (
-              <View key={i}>
-                <Text>{i}, {JSON.stringify(repo.full_name)}</Text>
+              <View style={styles.viewText} key={i}>
+                <Text style={styles.textName}>{i+1}, {JSON.stringify(repo.full_name)}</Text>
+                <View style={styles.textName}>
+                  <Text style={styles.textName}>Star: {JSON.stringify(repo.stargazers_count)}</Text> 
+                  <Image style={styles.image} source={require('./asset/star.png')} />
+                </View>
+                <Text style={styles.textName}>Language: {JSON.stringify(repo.language)} </Text>
               </View>
             )
           })
         }
+        {/* if (this.state.repo.length > 30) {
+          
+        } */}
+        <TouchableOpacity
+          style={styles.button}
+          activeOpacity={0.8}
+          onPress={this._showAlert}
+          >
+          <Text style={styles.buttonText}>Load More</Text>
+        </TouchableOpacity>
         </SafeAreaView>
       </ScrollView>
     )
@@ -84,6 +107,24 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     padding: 10,
     backgroundColor: '#FFFFFF',
+  },
+  viewText: {
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#d6d7da',
+    flex: 1,
+    padding: 10,
+    marginBottom: 10,
+  },
+  textName: {
+    padding: 5,
+    flex: 1,
+  },
+  image: {
+    flex: 1,
+    width: 16,
+    height: 16,
+    marginLeft: 5,
   },
   label: {
     fontSize: 16,
