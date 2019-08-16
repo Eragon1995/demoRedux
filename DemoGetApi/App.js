@@ -9,7 +9,8 @@ import {
   Alert,
   ScrollView,
   SafeAreaView,
-  Image
+  Image,
+  Animated
 } from 'react-native';
 
 const screenWidth = Dimensions.get('window').width;
@@ -18,6 +19,10 @@ export default class App extends Component {
   state = {
     username: '',
     repos: [],
+    page: 1,
+    listLoadMore: [],
+    loading: true,
+    error: null,
   }
 
   _handleChange = (evt) => {
@@ -28,22 +33,34 @@ export default class App extends Component {
 
   _getUserRepos = (username) => {
     username = username.toLowerCase().trim();
-    const url = `https://api.github.com/users/${username}/repos`;
+    const page = this.state.page;
+    const url = `https://api.github.com/users/${username}/repos?page=${page}&per_page=29`;
     return fetch(url).then((res) => res.json());
+  }
+
+  _nextController = (username) => {
+    navigation.navigate('StargazersScreen', {username});
+  }
+  _showLoading = () => {
+    // this._nextController(this.state.username)
+    console.log(this.state.username);
   }
 
   _handleSubmit = () => {
     this._getUserRepos(this.state.username)
       .then((res) => {
-        this.setState({repos: res});
+        this.setState({
+          let receivedDataList = res.repos;
+          let currentDataList = this.state.repos;
+          let newDataList = currentDataList.concat(receivedDataList);
+          let loadMoreData =true;
+          this.setState({
+            page: this.state.page+1,
+            repos: newDataList,
+            loading: false,
+        });
       });
   }
-
-  _showAlert = () => {
-    Alert.alert(
-       'Load More'
-    )
- }
 
   _renderRepos = () => {
     return (
@@ -54,7 +71,7 @@ export default class App extends Component {
           this.state.repos.map((repo, i) => {
             return (
               <View style={styles.viewText} key={i}>
-                <Text style={styles.textName}>{i+1}, {JSON.stringify(repo.full_name)}</Text>
+                <Text style={styles.textName}>{i+1}: {JSON.stringify(repo.full_name)}</Text>
                 <View style={styles.textName}>
                   <Text style={styles.textName}>Star: {JSON.stringify(repo.stargazers_count)}</Text> 
                   <Image style={styles.image} source={require('./asset/star.png')} />
@@ -64,16 +81,13 @@ export default class App extends Component {
             )
           })
         }
-        {/* if (this.state.repo.length > 30) {
-          
-        } */}
         <TouchableOpacity
-          style={styles.button}
-          activeOpacity={0.8}
-          onPress={this._showAlert}
-          >
-          <Text style={styles.buttonText}>Load More</Text>
-        </TouchableOpacity>
+                  style={styles.buttonNext}
+                  activeOpacity={0.8}
+                  onPress={this._showLoading}
+                >
+                  <Text style={styles.buttonText}>Load More</Text>
+                </TouchableOpacity>
         </SafeAreaView>
       </ScrollView>
     )
@@ -144,6 +158,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor:'#263238',
     borderColor: '#263238',
+    borderWidth: 1,
+    borderRadius: 8,
+    marginBottom: 10,
+    marginTop: 10,
+    alignSelf: 'stretch',
+    justifyContent: 'center'
+  },
+  buttonNext: {
+    height: 45,
+    flexDirection: 'row',
+    backgroundColor:'#3a3a3a',
+    borderColor: '#3a3a3a',
     borderWidth: 1,
     borderRadius: 8,
     marginBottom: 10,
